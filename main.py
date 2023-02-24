@@ -13,7 +13,7 @@ import cv2
 data_dir = "data/BCS"
 image_exts = ["jpeg", "jpg", "bmp", "png"]
 
-# Database filter
+# Data filter -> No weird images
 for image_class in os.listdir(data_dir):
     if image_class != ".DS_Store":
         for image in os.listdir(os.path.join(data_dir, image_class)):
@@ -26,7 +26,8 @@ for image_class in os.listdir(data_dir):
                     os.remove(image_path)
             except Exception as e:
                 print('Issue with image {}'.format(image_path))
-                # os.remove(image_path)
 
+# Data pipeline -> preprocessing and labels from libraries
+data = tf.keras.utils.image_dataset_from_directory("data")
 
 
