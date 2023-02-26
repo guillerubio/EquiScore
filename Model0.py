@@ -51,6 +51,27 @@ for idx, img in enumerate(batch[0][:4]):
 data = data.map(lambda x,y: (x/255, y)) # Transformation in map, x will now be in the 0-1 range
 scaled_iterator = data.as_numpy_iterator()
 scaled_batch = scaled_iterator.next()
-print(scaled_batch[0].max())
-print(len(data))
+print("Number of batches = " + str(len(data)))
+# Data Split
+
+train_size = int(len(data) * 0.7)
+val_size = int(len(data) * 0.2)+1
+test_size = int(len(data) * 0.1)+1
+
+print("Data range = (" + str(scaled_batch[0].min()) + ", " + str(scaled_batch[0].max())
+      + ") -> should be around (0.0, 1.0)")
+print("Train batches = " + str(train_size))
+print("Validation batches = " + str(val_size))
+print("Test batches = " + str(test_size))
+print("Total batches accounted = " + str(test_size+val_size+train_size) + " should be <= 8")
+
+take = data.take(train_size)
+val = data.skip(train_size).take(val_size)
+test = data.skip(train_size + val_size).take(test_size)
+
+# DEEP LEARNING MODEL
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Dropout
+
+
 
