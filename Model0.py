@@ -4,6 +4,7 @@ import os
 import imghdr
 import cv2
 import numpy
+
 from matplotlib import pyplot as plt
 
 # GPU memory growth limiter
@@ -28,6 +29,7 @@ for image_class in os.listdir(data_dir):
             except Exception as e:
                 print('Issue with image {}'.format(image_path))
 
+
 # Data pipeline -> preprocessing and labels from libraries
 data = tf.keras.utils.image_dataset_from_directory("data")
 data_iterator = data.as_numpy_iterator()
@@ -41,37 +43,71 @@ for idx, img in enumerate(batch[0][:4]):
     ax[idx].imshow(img.astype(int))
     ax[idx].title.set_text(batch[1][idx])
 
-#plt.show()
+# plt.show()
 
 """ NOTE: batch[0] contains the numerical values of our images, every batch will consist of 32 images
  of 256x256 pixels and 3 dimensions, coresponding to the RGB"""
 
 # DATA PREPROCESSING
 
-data = data.map(lambda x,y: (x/255, y)) # Transformation in map, x will now be in the 0-1 range
+data = data.map(lambda x, y: (x / 255, y))  # Transformation in map, x will now be in the 0-1 range
 scaled_iterator = data.as_numpy_iterator()
 scaled_batch = scaled_iterator.next()
 print("Number of batches = " + str(len(data)))
 # Data Split
 
 train_size = int(len(data) * 0.7)
-val_size = int(len(data) * 0.2)+1
-test_size = int(len(data) * 0.1)+1
+val_size = int(len(data) * 0.2) + 1
+test_size = int(len(data) * 0.1) + 1
 
 print("Data range = (" + str(scaled_batch[0].min()) + ", " + str(scaled_batch[0].max())
       + ") -> should be around (0.0, 1.0)")
 print("Train batches = " + str(train_size))
 print("Validation batches = " + str(val_size))
 print("Test batches = " + str(test_size))
-print("Total batches accounted = " + str(test_size+val_size+train_size) + " should be <= 8")
+print("Total batches accounted = " + str(test_size + val_size + train_size) + " should be <= 8")
 
 take = data.take(train_size)
 val = data.skip(train_size).take(val_size)
 test = data.skip(train_size + val_size).take(test_size)
 
+
 # DEEP LEARNING MODEL
-from keras.models import Sequential
-from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Dropout
+from keras.models import Sequential  # Sequential model building API -> in to out
+from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten  # Layers for our model
+
+# Model declaration and initialization
+model = Sequential()
+
+# Adding layers to our model
+
+# 1st Layer: Convolutional and MaxPooling layer (input)
+model.add(Conv2D(16, (3, 3), 1, activation='relu', input_shape=(256, 256, 3)))
+model.add(MaxPooling2D())  # Data condensation
+
+# 2nd Layer: Convolutional and MaxPooling layer
+model.add(Conv2D(32, (3, 3), 1, activation='relu'))
+model.add(MaxPooling2D())  # Data condensation
+
+# 3rd Layer: Convolutional and MaxPooling layer
+model.add(Conv2D(16, (3, 3), 1, activation='relu'))
+model.add(MaxPooling2D())  # Data condensation
+
+# 4th Layer: Condensation Layer
+model.add(Flatten())
+
+# 5th and 6th Layer: Fully connected neurons
+model.add(Dense(256, activation='relu'))
+model.add(Dense(10))
+
+# Model compilation
+model.compile('adam', metrics=["accuracy"])
+print()
+print(model.summary())
+
+
+
+
 
 
 
