@@ -29,7 +29,6 @@ for image_class in os.listdir(data_dir):
             except Exception as e:
                 print('Issue with image {}'.format(image_path))
 
-
 # Data pipeline -> preprocessing and labels from libraries
 data = tf.keras.utils.image_dataset_from_directory("data")
 data_iterator = data.as_numpy_iterator()
@@ -67,10 +66,9 @@ print("Validation batches = " + str(val_size))
 print("Test batches = " + str(test_size))
 print("Total batches accounted = " + str(test_size + val_size + train_size) + " should be <= 8")
 
-take = data.take(train_size)
+train = data.take(train_size)
 val = data.skip(train_size).take(val_size)
 test = data.skip(train_size + val_size).take(test_size)
-
 
 # DEEP LEARNING MODEL
 from keras.models import Sequential  # Sequential model building API -> in to out
@@ -101,13 +99,12 @@ model.add(Dense(256, activation='relu'))
 model.add(Dense(10))
 
 # Model compilation
-model.compile('adam', metrics=["accuracy"])
+model.compile('adam',loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=["accuracy"])
 print()
 print(model.summary())
 
+# TRAINING
 
-
-
-
-
-
+logdir = 'logs'
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
+hist = model.fit(train, epochs=20, validation_data=val, callbacks=[tensorboard_callback])
