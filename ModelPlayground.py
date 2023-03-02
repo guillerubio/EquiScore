@@ -17,7 +17,7 @@ def prediction(model_to_use, img_path):
 
 class ModelPlayground:
 
-    model = load_model(os.path.join("models", "es_dlm_00.h5"))
+    model = load_model(os.path.join("models", "es_dlm_01.h5"))
     img = cv2.imread("test.jpg")
     plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     plt.show()
