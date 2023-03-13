@@ -1,3 +1,4 @@
+# Made by Guillermo (William) Rubio on February 2023
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
